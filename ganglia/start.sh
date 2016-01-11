@@ -15,6 +15,8 @@ Run a ganglia-web container.
 EOF
 }
 
+service sshd start
+
 while true ; do
   case "$1" in
     -?|-h|-help|--help)

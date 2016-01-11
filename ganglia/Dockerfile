@@ -7,7 +7,7 @@ RUN yum upgrade -y && \
     yum install -y \
       gcc-c++ automake make \
       apr-devel expat-devel rrdtool-devel zlib-devel \
-      httpd php rsync wget tar && \
+      httpd php rsync wget tar openssh-server && \
     yum clean all
 
 # pcre dependency
@@ -56,6 +56,18 @@ RUN gmond -t \
 
 # add the start script
 ADD start.sh start.sh
+
+# install sshd
+RUN mkdir /var/run/sshd
+RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN chkconfig sshd on
+EXPOSE 22
+
+#set root password to default for the project dev
+RUN echo 'root:speedd' | chpasswd
+
+ADD gmetad.conf /etc/ganglia/gmetad.conf
+ADD gmond.conf /etc/ganglia/gmond.conf
 
 # entrypoint is the start script
 ENTRYPOINT ["bash","start.sh"]
